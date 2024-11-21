@@ -22,8 +22,8 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API PARA GESTION DE TRASACCIONES")
-                        .description("API para gestionar TRASACCIONES ")
+                        .title("API PARA GESTION DE CREDITO")
+                        .description("API para gestionar CREDITO ")
                         .version("v1.0"));
     }
 }

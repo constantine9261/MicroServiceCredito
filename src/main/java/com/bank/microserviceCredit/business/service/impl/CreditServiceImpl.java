@@ -6,6 +6,7 @@ import com.bank.microserviceCredit.Model.entity.CreditEntity;
 import com.bank.microserviceCredit.business.repository.ICreditRepository;
 import com.bank.microserviceCredit.business.service.ICreditService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CreditServiceImpl implements ICreditService {
@@ -30,6 +32,7 @@ public class CreditServiceImpl implements ICreditService {
                 .balance(request.getBalance())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .active(request.isActive()) // Mapea el atributo active desde el request
                 .build();
     }
 
@@ -40,6 +43,7 @@ public class CreditServiceImpl implements ICreditService {
                 .type(entity.getType())
                 .creditLimit(entity.getCreditLimit())
                 .balance(entity.getBalance())
+                .active(entity.getActive() != null ? entity.getActive() : false) // Asigna false si es nulo
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -90,10 +94,11 @@ public class CreditServiceImpl implements ICreditService {
         return creditRepository.findById(id).map(this::convertToDto);
     }
 
-    @Override
     public Flux<CreditDto> findAll() {
         return creditRepository.findAll()
-                .map(this::convertToDto);  // Asegúrate de que esta conversión esté bien
+                .map(this::convertToDto)
+                .doOnError(error -> log.error("Error al obtener créditos: {}", error.getMessage()))
+                .onErrorResume(error -> Flux.empty()); // Devuelve un flujo vacío si ocurre un error
     }
 
     @Override
@@ -116,5 +121,9 @@ public class CreditServiceImpl implements ICreditService {
         return creditRepository.findById(id).flatMap(creditRepository::delete);
     }
 
-
+    @Override
+    public Mono<Boolean> hasActiveCreditCard(String customerId) {
+        return creditRepository.findByCustomerId(customerId)
+                .any(credit -> "CREDIT_CARD".equalsIgnoreCase(credit.getType()) && Boolean.TRUE.equals(credit.getActive()));
+    }
 }

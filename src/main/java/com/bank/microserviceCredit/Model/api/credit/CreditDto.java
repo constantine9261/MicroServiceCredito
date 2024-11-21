@@ -13,6 +13,7 @@ public class CreditDto {
     private String type;
     private Double creditLimit;
     private Double balance;
+    private boolean active; // Indica si el crédito o tarjeta está activo
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
