@@ -20,5 +20,7 @@ public class CreditEntity implements Serializable {
     private Boolean active; // Cambiado a Boolean para permitir valores nulos
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime dueDate; // Fecha de vencimiento
+
 
 }

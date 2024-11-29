@@ -6,6 +6,8 @@ import com.bank.microserviceCredit.Model.api.credit.CreditRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public interface ICreditService {
 
     Mono<CreditDto> createCredit(CreditRequest request);
@@ -19,5 +21,11 @@ public interface ICreditService {
     Mono<Void> deleteById(String id);
 
     Mono<Boolean> hasActiveCreditCard(String customerId);
+
+    Mono<Boolean> hasOverdueDebts(String customerId);
+
+    Mono<List<CreditDto>> generateReport(String startDate, String endDate);
+
+    Flux<CreditDto> findByCustomerId(String customerId);
 
 }

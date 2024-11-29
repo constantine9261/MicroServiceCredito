@@ -16,4 +16,6 @@ public class CreditDto {
     private boolean active; // Indica si el crédito o tarjeta está activo
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime dueDate; // Fecha de vencimiento
+
 }

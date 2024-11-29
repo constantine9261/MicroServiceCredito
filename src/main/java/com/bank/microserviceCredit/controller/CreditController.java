@@ -97,4 +97,44 @@ public class CreditController {
         return creditService.hasActiveCreditCard(customerId);
     }
 
+
+    @Operation(summary = "Validar deudas vencidas", description = "Verifica si un cliente tiene deudas vencidas en sus productos de crédito")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Validación completada"),
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/customer/{id}/has-overdue-debts")
+    public Mono<Boolean> hasOverdueDebts(@PathVariable String id) {
+        return creditService.hasOverdueDebts(id);
+    }
+
+    @Operation(summary = "Reporte de créditos", description = "Genera un reporte de créditos por intervalo de tiempo")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Reporte generado con éxito"),
+            @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/report")
+    public Mono<ResponseDto<List<CreditDto>>> getCreditReport(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        return creditService.generateReport(startDate, endDate)
+                .map(report -> ResponseDtoBuilder.success(report, "Reporte generado con éxito"));
+    }
+
+    @Operation(summary = "Obtener créditos de un cliente", description = "Devuelve todos los créditos asociados a un cliente específico.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Créditos obtenidos con éxito"),
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/customer/{customerId}")
+    public Flux<ResponseDto<CreditDto>> getCreditsByCustomerId(@PathVariable String customerId) {
+        return creditService.findByCustomerId(customerId)
+                .map(credit -> ResponseDtoBuilder.success(credit, "Créditos encontrados"))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No se encontraron créditos para este cliente")));
+    }
+
+
 }
